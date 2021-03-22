@@ -1,14 +1,7 @@
 package com.sda.practical;
-
-import com.sda.practical.test1.MySQLConnection;
-import com.sda.practical.test1.MyTestClass;
-import com.sda.practical.test1.PostgreSQLConnection;
-import com.sda.practical.utils.DataValidator;
 import com.sda.practical.views.MainViewHandler;
+import com.sun.xml.bind.v2.TODO;
 
-import javax.persistence.PersistenceException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 public class App {
     public static void main(String[] args) {
@@ -31,10 +24,6 @@ public class App {
          *
          *
          * */
-        /*new MainViewHandler().startApplication();*/
-        MySQLConnection mySQLConnection = new MySQLConnection();
-        MyTestClass myTestClass=new MyTestClass();
-        PostgreSQLConnection postgreSQLConnection = new PostgreSQLConnection();
-        myTestClass.test(postgreSQLConnection);
+        new MainViewHandler().startApplication();
     }
 }

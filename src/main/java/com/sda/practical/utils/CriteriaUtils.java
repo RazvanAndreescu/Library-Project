@@ -21,6 +21,34 @@ public class CriteriaUtils {
         return userFeedback;
     }
 
+    public static String getUserCriteriaForUpdateAuthor(Scanner input) {
+        LoggerUtils.print("By date of birth(d) or by name(n)?");
+        String userFeedback = "";
+        while (true) {
+            userFeedback = input.nextLine();
+            if (userFeedback.equalsIgnoreCase("d") || userFeedback.equalsIgnoreCase("n")) {
+                break;
+            } else {
+                LoggerUtils.print(invalidAnswer);
+            }
+        }
+        return userFeedback;
+    }
+
+    public static String getUserCriteriaForUpdateBook(Scanner input){
+        LoggerUtils.print("Title(t) or Release date(r)?");
+        String userFeedback="";
+        while (true){
+            userFeedback = input.nextLine();
+            if(userFeedback.equalsIgnoreCase("t")|| userFeedback.equalsIgnoreCase("r")){
+                break;
+            } else {
+                LoggerUtils.print(invalidAnswer);
+            }
+        }
+        return userFeedback;
+    }
+
     public static String getUserCriteriaForBook(Scanner input) {
         LoggerUtils.print("By Id(i) or by title(t)?");
         String userFeedback = " ";

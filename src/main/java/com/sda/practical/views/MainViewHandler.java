@@ -2,6 +2,7 @@ package com.sda.practical.views;
 
 import com.sda.practical.database.AuthorRepository;
 import com.sda.practical.database.BookRepository;
+import com.sda.practical.exceptions.DatabaseCRUDException;
 import com.sda.practical.exceptions.DatabaseConnectionException;
 import com.sda.practical.exceptions.UnknownException;
 import com.sda.practical.services.AuthorService;
@@ -23,9 +24,7 @@ public class MainViewHandler {
         BookRepository bookRepository = new BookRepository();
         int userOption = 0;
         while (userOption != 9) {
-            //Display menu
             menuHandler.printMainMenu();
-            //Get option from user (using keyboard)
             userOption = KeyboardUtils.readNumber(input, "Insert an option");
             option(authorService, authorRepository, bookService, bookRepository, input, userOption);
         }
@@ -36,41 +35,47 @@ public class MainViewHandler {
         } catch (DatabaseConnectionException e) {
             LoggerUtils.print(e.getExceptionMessage());
         }
-        //Garbage collector for authors
     }
 
     private static void option(AuthorService authorService, AuthorRepository authorRepository, BookService bookService,
                                BookRepository bookRepository, Scanner input, int userOption) {
         try {
             switch (userOption) {
-                case 1: //OK
+                case 1:
                     authorService.addAuthor(input, authorRepository);
                     break;
-                case 2: //OK
+                case 2:
                     authorService.deleteAuthor(input, authorRepository);
                     break;
-                case 3: //OK
+                case 3:
                     bookService.addBook(input, bookRepository, authorRepository);
                     break;
-                case 4: //OK
+                case 4:
                     bookService.deleteBook(input, bookRepository, authorRepository);
                     break;
-                case 5: //OK
+                case 5:
                     authorService.printAllAuthors(authorRepository);
                     break;
-                case 6: //OK
+                case 6:
                     bookService.printAllBooks(bookRepository);
                     break;
                 case 7:
-                    /*authorService.findAuthor();*/
+                    authorService.findAuthor(authorRepository, input);
                     break;
                 case 8:
-                  /*  bookService.findBook();*/
+                    bookService.findBook(input, bookRepository);
                     break;
                 case 9:
                     break;
+                case 10:
+                    authorService.editAuthor(authorRepository, input);
+                    break;
+                case 11:
+                    bookService.editBook(input, bookRepository, authorRepository);
+                    break;
                 default:
-                    LoggerUtils.print("Unknown option");
+                    LoggerUtils.print("Return to the main menu");
+                    break;
             }
         } catch (DatabaseConnectionException e) {
             LoggerUtils.print(e.getExceptionMessage());

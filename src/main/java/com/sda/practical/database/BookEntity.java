@@ -9,7 +9,8 @@ public class BookEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int bookId;
+    @Column(name = "bookId")
+    private int Id;
 
     private String bookTitle;
 
@@ -19,12 +20,13 @@ public class BookEntity {
     @JoinColumn(name = "authorId")
     private AuthorEntity authorEntity;
 
-    public BookEntity(){}
+    public BookEntity() {
+    }
 
-    public BookEntity(String bookTitle, Date releaseDate, AuthorEntity authorEntity){
-        this.authorEntity=authorEntity;
-        this.bookTitle=bookTitle;
-        this.releaseDate=releaseDate;
+    public BookEntity(String bookTitle, Date releaseDate, AuthorEntity authorEntity) {
+        this.authorEntity = authorEntity;
+        this.bookTitle = bookTitle;
+        this.releaseDate = releaseDate;
     }
 
     public void setBookTitle(String bookTitle) {
@@ -43,8 +45,16 @@ public class BookEntity {
         return authorEntity;
     }
 
+    public Date getReleaseDate(){
+        return releaseDate;
+    }
+
+    public void setId(int id) {
+        Id = id;
+    }
+
     @Override
     public String toString() {
-        return bookId + ". " + bookTitle + " by " + authorEntity.getAuthorFirstName() + " " + authorEntity.getAuthorLastName();
+        return Id + ". " + bookTitle + " by " + authorEntity.getAuthorFirstName() + " " + authorEntity.getAuthorLastName();
     }
 }

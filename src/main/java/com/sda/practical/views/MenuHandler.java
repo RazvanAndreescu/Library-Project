@@ -1,7 +1,10 @@
 package com.sda.practical.views;
 
+import com.sda.practical.utils.LoggerUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 //It will keep our menus
 public class MenuHandler {
@@ -17,12 +20,16 @@ public class MenuHandler {
         menuList.add("7. Find author");
         menuList.add("8. Find book");
         menuList.add("9. Exit Application");
+        menuList.add("10. Edit author");
+        menuList.add("11. Edit book");
         return menuList;
     }
 
-    public void printMainMenu(){
-        for(String option : getMainMenu()){
-            System.out.print(option+"     ");
+    public void printMainMenu() {
+        LoggerUtils.addNewLine();
+        for (String option : getMainMenu()) {
+            LoggerUtils.printInLine(option);
         }
+        LoggerUtils.addNewLine();
     }
 }

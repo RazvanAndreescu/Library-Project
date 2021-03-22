@@ -5,9 +5,7 @@ import com.sda.practical.database.AuthorRepository;
 import com.sda.practical.exceptions.DatabaseCRUDException;
 import com.sda.practical.exceptions.DatabaseConnectionException;
 import com.sda.practical.exceptions.UnknownException;
-import com.sda.practical.utils.CriteriaUtils;
-import com.sda.practical.utils.DataValidator;
-import com.sda.practical.utils.LoggerUtils;
+import com.sda.practical.utils.*;
 
 import java.sql.Date;
 import java.util.Scanner;
@@ -15,18 +13,11 @@ import java.util.Scanner;
 public class AuthorService extends BaseService {
 
     public void addAuthor(Scanner input, AuthorRepository authorRepository) throws UnknownException, DatabaseConnectionException {
-        LoggerUtils.print("Insert First Name");
-        String firstName = input.nextLine();
-        LoggerUtils.print("Insert Last Name");
-        String lastName = input.nextLine();
-        String date = DataValidator.validateSQLDataFormat("Insert author's date of birth", input);
-        Date dateOfBirth = Date.valueOf(date);
         AuthorEntity authorEntity = new AuthorEntity();
-        authorEntity.setAuthorFirstName(firstName);
-        authorEntity.setAuthorLastName(lastName);
-        authorEntity.setDateOfBirth(dateOfBirth);
+        getAuthorNameFromUser(authorEntity, input);
+        getAuthorDateOfBirthFromUser(authorEntity, input);
         try {
-            authorRepository.addAuthor(authorEntity);
+            authorRepository.add(authorEntity);
         } catch (DatabaseCRUDException e) {
             LoggerUtils.print(e.getExceptionMessage());
         }
@@ -37,21 +28,9 @@ public class AuthorService extends BaseService {
         String userCriteria = CriteriaUtils.getUserCriteriaForAuthor(input);
         AuthorEntity authorEntity;
         try {
-            LoggerUtils.print(authorRepository.getAllAuthors());
-            if (userCriteria.equalsIgnoreCase("i")) {
-                LoggerUtils.print("Insert authorId: ");
-                int authorId = input.nextInt();
-                authorEntity = authorRepository.getAuthorById(authorId);
-            } else {
-                LoggerUtils.print("Insert author's first name: ");
-                String firstName = input.nextLine();
-                LoggerUtils.print("Insert author's last name: ");
-                String lastName = input.nextLine();
-                authorEntity = authorRepository.getAuthorByName(firstName, lastName);
-            }
-
+            authorEntity = generateAuthor(userCriteria, input, authorRepository);
             if (askConfirmationFormUser(input)) {
-                authorRepository.deleteAuthor(authorEntity);
+                authorRepository.delete(authorEntity);
                 LoggerUtils.print("The author was successfully deleted from the database!");
             }
         } catch (DatabaseCRUDException e) {
@@ -61,34 +40,98 @@ public class AuthorService extends BaseService {
 
     public void deleteAuthorsWithNoBookInDatabase(AuthorRepository authorRepository) throws UnknownException, DatabaseConnectionException {
         try {
-            if (authorRepository.getAuthorsWithNoBookInTheDatabase().size() == 0) {
-                return;
-            }
-            for (AuthorEntity authorEntity : authorRepository.getAuthorsWithNoBookInTheDatabase()) {
-
-                authorRepository.deleteAuthor(authorEntity);
+            if (authorRepository.getAuthorsWithNoBookInTheDatabase().size() != 0) {
+                for (AuthorEntity authorEntity : authorRepository.getAuthorsWithNoBookInTheDatabase()) {
+                    authorRepository.delete(authorEntity);
+                }
             }
         } catch (DatabaseCRUDException e) {
-            LoggerUtils.print(e.getExceptionMessage());
+            LoggerUtils.print(e.getExceptionMessage() + "!3");
         }
         LoggerUtils.print("All authors without any book in the database were deleted!");
     }
 
     public void printAllAuthors(AuthorRepository authorRepository) throws UnknownException, DatabaseConnectionException {
         try {
-            LoggerUtils.print(authorRepository.getAllAuthors());
+            LoggerUtils.print(authorRepository.getAll(GenericTypes.getAuthorEntity()));
         } catch (DatabaseCRUDException e) {
             LoggerUtils.print(e.getExceptionMessage());
         }
     }
 
-    public void findAuthor(AuthorRepository authorRepository, Scanner input) {
+    public void findAuthor(AuthorRepository authorRepository, Scanner input) throws DatabaseConnectionException, UnknownException {
         String userCriteria = CriteriaUtils.getUserCriteriaForAuthor(input);
+        AuthorEntity authorEntity = null;
+        try {
+            authorEntity = generateAuthor(userCriteria, input, authorRepository);
+        } catch (DatabaseCRUDException e) {
+            LoggerUtils.print(e.getExceptionMessage());
+        }
+        if (authorEntity != null) {
+            LoggerUtils.print(authorEntity);
+        }
+    }
+
+    public void editAuthor(AuthorRepository authorRepository, Scanner input) throws DatabaseConnectionException, UnknownException {
+        try {
+            LoggerUtils.print(authorRepository.getAll(GenericTypes.getAuthorEntity()));
+            if (authorRepository.getAll(GenericTypes.getAuthorEntity()).size() != 0) {
+                int authorId = KeyboardUtils.readNumber(input, "Insert authorId: ");
+                AuthorEntity authorEntity = authorRepository.getById(authorId, GenericTypes.getAuthorEntity());
+                if (authorEntity != null) {
+                    String userCriteria = CriteriaUtils.getUserCriteriaForUpdateAuthor(input);
+                    if (userCriteria.equalsIgnoreCase("n")) {
+                        getAuthorNameFromUser(authorEntity, input);
+                    } else {
+                        getAuthorUpdatedDateOfBirthFromUser(authorEntity, input);
+                    }
+                    authorRepository.update(authorEntity);
+                    LoggerUtils.print("The author was successfully updated!");
+                }
+            }
+        } catch (DatabaseCRUDException e) {
+            LoggerUtils.print(e.getExceptionMessage());
+        }
+    }
+
+    private AuthorEntity generateAuthor(String userCriteria, Scanner input, AuthorRepository authorRepository) throws DatabaseCRUDException, UnknownException, DatabaseConnectionException {
+        AuthorEntity authorEntity = null;
+        LoggerUtils.print(authorRepository.getAll(GenericTypes.getAuthorEntity()));
         if (userCriteria.equalsIgnoreCase("i")) {
-            LoggerUtils.print("Insert authorId: ");
-            int authorId = input.nextInt();
-            input.nextLine();
-            AuthorEntity authorEntity = authorRepository.getAuthorById(authorId);
+            int authorId = KeyboardUtils.readNumber(input, "Insert authorId: ");
+            authorEntity = authorRepository.getById(authorId, GenericTypes.getAuthorEntity());
+        } else {
+            LoggerUtils.print("Insert author's first name: ");
+            String firstName = input.nextLine();
+            LoggerUtils.print("Insert author's last name: ");
+            String lastName = input.nextLine();
+            authorEntity = authorRepository.getAuthorByName(firstName, lastName);
+        }
+        return authorEntity;
+    }
+
+    private void getAuthorNameFromUser(AuthorEntity authorEntity, Scanner input) {
+        LoggerUtils.print("Insert First Name");
+        String firstName = input.nextLine();
+        LoggerUtils.print("Insert Last Name");
+        String lastName = input.nextLine();
+        authorEntity.setAuthorFirstName(firstName);
+        authorEntity.setAuthorLastName(lastName);
+    }
+
+    private void getAuthorDateOfBirthFromUser(AuthorEntity authorEntity, Scanner input) {
+        String date = DataValidator.validateSQLDataFormat("Insert author's date of birth", input);
+        authorEntity.setDateOfBirth(Date.valueOf(date));
+    }
+
+    private void getAuthorUpdatedDateOfBirthFromUser(AuthorEntity authorEntity, Scanner input) {
+        while (true) {
+            String dateOfBirth = DataValidator.validateSQLDataFormat("Insert the new date of birth: ", input);
+            if (DataValidator.validateUpdatedDateAuthor(authorEntity, Date.valueOf(dateOfBirth))) {
+                authorEntity.setDateOfBirth(Date.valueOf(dateOfBirth));
+                break;
+            }
+            LoggerUtils.print("The author's date of birth has to be before his first book's release date!");
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.sda.practical.utils;
 
 import com.sda.practical.database.AuthorEntity;
+import com.sda.practical.database.BookEntity;
 
 import java.sql.Date;
 import java.util.Scanner;
@@ -25,9 +26,18 @@ public class DataValidator {
 
     public static boolean validateReleaseDate(AuthorEntity authorEntity, Date date) {
         Date authorDateOfBirth = authorEntity.getDateOfBirth();
-        if(!date.after(authorDateOfBirth)){
+        if (!date.after(authorDateOfBirth)) {
             LoggerUtils.print("Release date has to be after the author's date of birth!");
         }
         return date.after(authorDateOfBirth);
+    }
+
+    public static boolean validateUpdatedDateAuthor(AuthorEntity authorEntity, Date date) {
+        for (BookEntity bookEntity : authorEntity.getListOfBooks()) {
+            if(date.after(bookEntity.getReleaseDate())){
+                return false;
+            }
+        }
+        return true;
     }
 }

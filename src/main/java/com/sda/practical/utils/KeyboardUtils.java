@@ -6,7 +6,6 @@ import java.util.Scanner;
 public class KeyboardUtils {
 
     public static int readNumber(Scanner input, String message) {
-        System.out.println();
         Integer value=null;
         while (value==null){
             try {

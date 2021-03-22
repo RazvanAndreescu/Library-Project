@@ -12,7 +12,8 @@ public class AuthorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int authorId;
+    @Column(name = "authorId")
+    private int Id;
 
     @Column(name = "firstName")
     private String authorFirstName;
@@ -22,7 +23,7 @@ public class AuthorEntity {
 
     private Date dateOfBirth;
 
-    @OneToMany(mappedBy = "authorEntity", fetch = FetchType.EAGER) //TODO an query to get all books from a specific author
+    @OneToMany(mappedBy = "authorEntity", fetch = FetchType.EAGER)
     private List<BookEntity> bookSet;
 
     public void setAuthorFirstName(String authorFirstName) {
@@ -41,8 +42,8 @@ public class AuthorEntity {
         return bookSet;
     }
 
-    public void setAuthorId(int authorId) {
-        this.authorId = authorId;
+    public void setId(int id) {
+        this.Id = id;
     }
 
     public String getAuthorLastName() {
@@ -59,7 +60,7 @@ public class AuthorEntity {
 
     @Override
     public String toString() {
-        return authorId +
+        return Id +
                 ". " + authorFirstName +
                 " " + authorLastName;
     }

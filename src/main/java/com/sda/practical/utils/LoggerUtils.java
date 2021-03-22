@@ -22,6 +22,14 @@ public class LoggerUtils {
     public static void print(BookEntity bookEntity){
         System.out.println(bookEntity);
     }
+
+    public static void addNewLine(){
+        System.out.println();
+    }
+
+    public static void printInLine(String message){
+        System.out.print(message+"    ");
+    }
 }
 
 
